@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그아웃</title>
+</head>
+<body>
+    <h2> 로그아웃 </h2>
+    
+    <p>안녕하세요, {{ user.username }}님!</p>
+    <p>로그아웃 하시겠습니까?</p>
+
+    <a href="{% url 'user:login' %}">로그아웃</a>
+    <p><a href="{% url 'user:signup' %}">회원 가입으로 돌아가기</a></p>
+</body>
+</html>
