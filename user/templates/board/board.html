@@ -1,0 +1,35 @@
+{% extends 'board/base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+{% if board %}
+  <table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th scope="col">번호</th>
+        <th scope="col">제목</th>
+        <th scope="col">내용</th>
+        <th scope="col">작성자</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for board_list in board %}
+        <tr>
+          <td>{{ board_list.pk }}</td>
+          <td>{{ board_list.title }}</td>
+          <td>{{ board_list.content }}</td>
+          <td>{{ board_list.writer }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+<div class="container mt-4">
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% bootstrap_form boardForm %}
+    <button type="submit" class="btn btn-primary rounded-pill col-12">POST</button>
+  </form>
+</div>
+{% endblock %}
