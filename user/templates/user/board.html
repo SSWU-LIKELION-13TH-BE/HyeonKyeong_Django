@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    {% block content %}
+    {% if user %}
+    <table class="table table-bordered text-center">
+        <thead>
+        <tr>
+            <th scope="col">번호</th>
+            <th scope="col">제목</th>
+            <th scope="col">내용</th>
+            <th scope="col">작성자</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user_list in users %}
+            <tr>
+            <td>{{ user_list.pk }}</td>
+            <td>{{ user_list.title }}</td>
+            <td>{{ user_list.content }}</td>
+            <td>{{ user_list.writer }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div class="container mt-4">
+    <form action="" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form boardForm %}
+        <button type="submit" class="btn btn-primary rounded-pill col-12">POST</button>
+    </form>
+    </div>
+    {% endblock %}
+</body>
+</html>

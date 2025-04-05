@@ -40,3 +40,32 @@ def logout_view(request):
 
 def home_view(request):
     return render(request, 'home.html')
+
+def index_view(request):
+    context = {
+        'title': 'User list',
+        'user_list' : [
+            {'no': 1, 'title': '목록1'},
+            {'no': 2, 'title': '목록2'},
+            {'no': 3, 'title': '목록3'},
+            {'no': 4, 'title': '목록4'},
+            {'no': 5, 'title': '목록5'}
+        ]
+    }
+    return render(request, 'user/index.html', context)
+
+def user_view(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_view')  # url name에 맞게 조정
+    else:
+        form = UserForm()
+
+    users = User.objects.all()
+    context = {
+        'boardForm': form,
+        'users': users,
+    }
+    return render(request, 'board.html', context)
