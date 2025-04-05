@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views  # 비밀번호 관련 뷰�
 app_name='user'
 
 urlpatterns = [
-    path('', index_view, name = 'index'),
+    path('', index_view, name = 'home'),
     path('signup/',signup_view, name='signup'),
     path("login/", login_view, name="login"),  # 로그인 URL
     path('logout/', logout_view, name='logout'),  # 로그아웃 URL 추가
@@ -17,5 +17,4 @@ urlpatterns = [
     path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-
 ]
