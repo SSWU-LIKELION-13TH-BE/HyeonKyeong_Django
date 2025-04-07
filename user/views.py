@@ -41,7 +41,11 @@ def logout_view(request):
     return render(request, "logout.html")
 
 def home_view(request):
-    return render(request, 'home.html')
+    board = Board.objects.all().order_by('-id')  # 최신 글부터 보여줌
+    context = {
+        'board': board,
+    }
+    return render(request, 'home.html', context)
 
 
 def board_view(request):
@@ -62,7 +66,7 @@ def board_view(request):
             image=image,
         )
         board.save()
-        return redirect('user:board')
+        return redirect('user:home')
     else:
         boardForm = BoardForm()
         board = Board.objects.all()

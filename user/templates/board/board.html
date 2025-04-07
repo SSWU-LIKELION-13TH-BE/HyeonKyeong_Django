@@ -5,7 +5,7 @@
   <title>게시판</title>
 <style>
   
-   form {
+  form {
     text-align: center;
   }
   th, td{
@@ -28,40 +28,6 @@
 </style>
 </head>
 <body>
-
-{% if board %}
-  <table>
-    <thead>
-      <tr>
-        <th>번호</th>
-        <th>제목</th>
-        <th>내용</th>
-        <th>작성자</th>
-        <th>이미지</th>
-        <th>기술 스택</th>
-        <th>깃허브 링크</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for board_list in board %}
-        <tr>
-          <td>{{ board_list.pk }}</td>
-          <td>{{ board_list.title }}</td>
-          <td>{{ board_list.content }}</td>
-          <td>{{ board_list.writer }}</td>
-          <td>
-            {% if board_list.image %}
-              <img src="{{ board_list.image.url }}" alt="첨부 이미지">
-            {% endif %}
-          </td>
-          <td>{{ board_list.stacks }}</td>
-          <td>{{ board_list.github_link }}</td>
-
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% endif %}
 
 <form action="" method="POST" enctype="multipart/form-data">
   {% csrf_token %}

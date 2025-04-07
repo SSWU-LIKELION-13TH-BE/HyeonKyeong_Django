@@ -4,6 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>홈</title>
+    <style>
+  
+        form {
+          text-align: center;
+        }
+        th, td{
+          border: solid 1px black;
+        }
+        input, textarea {
+          width: 100%;
+          padding-bottom: 10%;
+        }
+        button{
+          width: 100%;
+          padding: 10px;
+          margin-top: 5%;
+          background-color: gainsboro;
+        }
+      
+        img{
+          width: 100px;
+        }
+      </style>
 </head>
 <body>
     <h2>홈 페이지</h2>
@@ -19,7 +42,44 @@
         <a href="{% url 'user:login' %}">로그인</a> | 
         <a href="{% url 'user:signup' %}">회원가입</a>
 
-        <a href="{% url 'user:password_reset' %}">비밀번호 찾기</a>
+        <a href="{% url 'user:password_reset' %}">비밀번호 찾기</a> <br>
     {% endif %}
+
+
+<a href="{% url 'user:board' %}">게시판 가기</a>
+{% if board %}
+  <table>
+    <thead>
+      <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>내용</th>
+        <th>작성자</th>
+        <th>이미지</th>
+        <th>기술 스택</th>
+        <th>깃허브 링크</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for board_list in board %}
+        <tr>
+          <td>{{ board_list.pk }}</td>
+          <td>{{ board_list.title }}</td>
+          <td>{{ board_list.content }}</td>
+          <td>{{ board_list.writer }}</td>
+          <td>
+            {% if board_list.image %}
+              <img src="{{ board_list.image.url }}" alt="첨부 이미지">
+            {% endif %}
+          </td>
+          <td>{{ board_list.stacks }}</td>
+          <td><a href="{{ board_list.github_link }}" target="_blank">{{ board_list.github_link }}</a></td>
+
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
 </body>
 </html>
