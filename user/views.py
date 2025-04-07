@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Board
-from .forms import BoardForm
+from .models import Like, Board, Comment
+from .forms import BoardForm, CommentForm
 
 
 def signup_view(request):
@@ -75,3 +75,31 @@ def board_view(request):
             'board': board,
         }
         return render(request, 'board/board.html', context)
+
+#댓글작성
+def comment_view(request, pk):
+    posting = get_object_or_404(Board, pk=pk)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            Comment.objects.create(
+                user=request.user,
+                posting=posting,
+                content=form.cleaned_data['content']
+            )
+    return redirect('user:board_detail', pk=pk)
+
+def toggle_like_view(request, pk):
+    posting = get_object_or_404(Board, pk=pk)
+    like, created = Like.objects.get_or_create(user=request.user, posting=posting)
+    if not created:
+        like.delete()
+    return redirect('user:board_detail', pk=pk)
+    
+def board_detail_view(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    comment_form = CommentForm()
+    return render(request, 'board/board_detail.html', {
+        'board': board,
+        'comment_form': comment_form,
+    })

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -25,3 +26,21 @@ class Board(models.Model):
     ]
     stacks = models.CharField(max_length=200, choices=STACK_CHOICES, null=True, blank=True)
     github_link = models.URLField(null=True, blank=True)
+
+
+
+class Comment(models.Model):
+    user       = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    posting    = models.ForeignKey('Board', on_delete=models.CASCADE)
+    content    = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'comments'
+
+class Like(models.Model):
+    user    = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    posting = models.ForeignKey('Board', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'likes'

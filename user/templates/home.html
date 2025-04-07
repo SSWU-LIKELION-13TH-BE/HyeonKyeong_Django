@@ -46,7 +46,8 @@
     {% endif %}
 
 
-<a href="{% url 'user:board' %}">게시판 가기</a>
+<a href="{% url 'user:board' %}">게시판 글쓰기</a>
+
 {% if board %}
   <table>
     <thead>
@@ -64,7 +65,15 @@
       {% for board_list in board %}
         <tr>
           <td>{{ board_list.pk }}</td>
-          <td>{{ board_list.title }}</td>
+          <td>
+            {% if board_list.pk %}
+              <a href="{% url 'user:board_detail' board_list.pk %}">
+                {{ board_list.title }}
+              </a>
+            {% else %}
+              {{ board_list.title }}
+            {% endif %}
+          </td>
           <td>{{ board_list.content }}</td>
           <td>{{ board_list.writer }}</td>
           <td>

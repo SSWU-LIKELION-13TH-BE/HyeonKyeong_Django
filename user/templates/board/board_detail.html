@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ board.title }} - 상세 페이지</title>
+</head>
+<body>
+    <h1>{{ board.title }}</h1>
+    <p><strong>작성자:</strong> {{ board.writer }}</p>
+    <p>{{ board.content }}</p>
+    {% if board.image %}
+        <img src="{{ board.image.url }}" alt="첨부 이미지">
+    {% endif %}
+    <p><strong>기술 스택:</strong> {{ board.stacks }}</p>
+    <p><a href="{{ board.github_link }}" target="_blank">깃허브 링크</a></p>
+
+    <!-- 좋아요 버튼 -->
+    <form action="{% url 'user:toggle_like' board.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit"> 좋아요</button>
+    </form>
+
+    <!-- 댓글 출력 -->
+    <h3>댓글</h3>
+    {% for comment in board.comment_set.all %}
+        <p><strong>{{ comment.user.username }}</strong>: {{ comment.content }}</p>
+    {% endfor %}
+
+    <!-- 댓글 작성 -->
+    <form action="{% url 'user:comment' board.id %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" cols="50"></textarea>
+        <button type="submit">댓글 작성</button>
+    </form>
+</body>
+</html>

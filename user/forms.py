@@ -17,3 +17,9 @@ class BoardForm(ModelForm):
     class Meta:
         model = Board
         fields = ['title', 'content', 'writer','image', 'stacks', 'github_link']
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
