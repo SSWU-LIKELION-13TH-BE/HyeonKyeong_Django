@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <title>게시판</title>
 <style>
+  
    form {
     text-align: center;
   }
-  tr,td{
+  th, td{
     border: solid 1px black;
-    width: 10%;
   }
   input, textarea {
     width: 100%;
@@ -20,6 +20,10 @@
     padding: 10px;
     margin-top: 5%;
     background-color: gainsboro;
+  }
+
+  img{
+    width: 100px;
   }
 </style>
 </head>
@@ -33,6 +37,9 @@
         <th>제목</th>
         <th>내용</th>
         <th>작성자</th>
+        <th>이미지</th>
+        <th>기술 스택</th>
+        <th>깃허브 링크</th>
       </tr>
     </thead>
     <tbody>
@@ -42,13 +49,21 @@
           <td>{{ board_list.title }}</td>
           <td>{{ board_list.content }}</td>
           <td>{{ board_list.writer }}</td>
+          <td>
+            {% if board_list.image %}
+              <img src="{{ board_list.image.url }}" alt="첨부 이미지">
+            {% endif %}
+          </td>
+          <td>{{ board_list.stacks }}</td>
+          <td>{{ board_list.github_link }}</td>
+
         </tr>
       {% endfor %}
     </tbody>
   </table>
 {% endif %}
 
-<form action="" method="POST">
+<form action="" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
   
   <h3 for="id_title">제목</h3> 
@@ -59,6 +74,22 @@
   
   <h3 for="id_writer">작성자</h3>
   <input type="text" name="writer" id="id_writer" required><br>
+
+  
+  <h3 for="id_image">이미지</h3>
+  <input type="file" name="image" id="id_image">
+
+  <h3 for="id_stacks">기술 스택</h3>
+  <select name="stacks" id="id_stacks">
+    <option value="python">Python</option>
+    <option value="django">Django</option>
+    <option value="javascript">JavaScript</option>
+    <option value="react">React</option>
+    <option value="java">Java</option>
+  </select>
+
+  <h3 for="id_github_link">GitHub 링크</h3>
+  <input type="url" name="github_link" id="id_github_link">
   
   <button type="submit" href="{% url 'user:board' %}">POST</button>
 </form>

@@ -16,4 +16,4 @@ class SignUpForm(UserCreationForm):
 class BoardForm(ModelForm):
     class Meta:
         model = Board
-        fields = ['title', 'content', 'writer']
+        fields = ['title', 'content', 'writer','image', 'stacks', 'github_link']

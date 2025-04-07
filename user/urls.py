@@ -2,6 +2,7 @@ from django.urls import path
 from .views import signup_view, login_view, logout_view, home_view, board_view
 from django.contrib.auth import views as auth_views  # 비밀번호 관련 뷰를 가져옴
 
+
 app_name='user'
 
 urlpatterns = [

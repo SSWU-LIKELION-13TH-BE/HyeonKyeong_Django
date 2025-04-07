@@ -15,3 +15,13 @@ class Board(models.Model):
     title = models.CharField(max_length=20, null=True)
     content = models.TextField()
     writer = models.CharField(max_length=20, null=True)
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    STACK_CHOICES = [
+        ('python', 'Python'),
+        ('django', 'Django'),
+        ('javascript', 'JavaScript'),
+        ('react', 'React'),
+        ('java', 'Java'),
+    ]
+    stacks = models.CharField(max_length=200, choices=STACK_CHOICES, null=True, blank=True)
+    github_link = models.URLField(null=True, blank=True)
