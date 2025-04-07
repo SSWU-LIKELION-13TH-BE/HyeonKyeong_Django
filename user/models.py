@@ -9,3 +9,9 @@ class CustomUser(AbstractUser):
 
     groups = models.ManyToManyField(Group, related_name="customuser_set", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="customuser_permissions_set", blank=True)
+
+
+class Board(models.Model):
+    title = models.CharField(max_length=20, null=True)
+    content = models.TextField()
+    writer = models.CharField(max_length=20, null=True)

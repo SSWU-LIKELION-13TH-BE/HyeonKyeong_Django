@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm
 from django.contrib.auth.forms import AuthenticationForm
 
+from .forms import *
+from .models import *
 
 
 def signup_view(request):
@@ -40,3 +42,26 @@ def logout_view(request):
 
 def home_view(request):
     return render(request, 'home.html')
+
+
+def board_view(request):
+    if request.method == 'POST':
+        title = request.POST['title']
+        content = request.POST['content']
+        writer = request.POST['writer']
+
+        board = Board(
+            title=title,
+            content=content,
+            writer=writer,
+        )
+        board.save()
+        return redirect('user:board')
+    else:
+        boardForm = BoardForm
+        board = Board.objects.all()
+        context = {
+            'boardForm': boardForm,
+            'board': board,
+        }
+        return render(request, 'board/board.html', context)
