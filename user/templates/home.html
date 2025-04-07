@@ -26,6 +26,7 @@
         img{
           width: 100px;
         }
+        
       </style>
 </head>
 <body>
@@ -42,11 +43,12 @@
         <a href="{% url 'user:login' %}">로그인</a> | 
         <a href="{% url 'user:signup' %}">회원가입</a>
 
-        <a href="{% url 'user:password_reset' %}">비밀번호 찾기</a> <br>
+        <a href="{% url 'user:password_reset' %}">비밀번호 찾기</a>
     {% endif %}
 
+<br>
 
-<a href="{% url 'user:board' %}">게시판 글쓰기</a>
+<strong> <a href="{% url 'user:board' %}" >게시판 글쓰기</a> </strong>
 
 {% if board %}
   <table>

@@ -3,9 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Like, Board, Comment
+from .models import Like, Board, Comment, CommentLike
 from .forms import BoardForm, CommentForm
-
+from django.contrib.auth.decorators import login_required
 
 def signup_view(request):
     if request.method == 'POST':
@@ -13,7 +13,8 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             return redirect('user:login')
-
+        else:
+            print(form.errors) 
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
@@ -82,16 +83,21 @@ def comment_view(request, pk):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
+            parent_id = request.POST.get('parent_id')
+            parent = Comment.objects.get(id=parent_id) if parent_id else None
             Comment.objects.create(
                 user=request.user,
                 posting=posting,
-                content=form.cleaned_data['content']
+                content=form.cleaned_data['content'],
+                parent=parent
             )
     return redirect('user:board_detail', pk=pk)
 
+
+@login_required(login_url='login')  # 로그인하지 않은 경우 로그인 페이지로 이동
 def toggle_like_view(request, pk):
-    posting = get_object_or_404(Board, pk=pk)
-    like, created = Like.objects.get_or_create(user=request.user, posting=posting)
+    comment = get_object_or_404(Board, pk=pk)
+    like, created = Like.objects.get_or_create(user=request.user, posting=comment)
     if not created:
         like.delete()
     return redirect('user:board_detail', pk=pk)
@@ -103,3 +109,10 @@ def board_detail_view(request, pk):
         'board': board,
         'comment_form': comment_form,
     })
+
+def toggle_comment_like_view(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    like, created = CommentLike.objects.get_or_create(user=request.user, comment=comment)
+    if not created:
+        like.delete()
+    return redirect('user:board_detail', pk=comment.posting.id)
