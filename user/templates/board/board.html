@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시판</title>
+<style>
+  
+  form {
+    text-align: center;
+  }
+  th, td{
+    border: solid 1px black;
+  }
+  input, textarea {
+    width: 100%;
+    padding-bottom: 10%;
+  }
+  button{
+    width: 100%;
+    padding: 10px;
+    margin-top: 5%;
+    background-color: gainsboro;
+  }
+
+  img{
+    width: 100px;
+  }
+</style>
+</head>
+<body>
+
+<form action="" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  
+  <h3 for="id_title">제목</h3> 
+  <input type="text" name="title" id="id_title" required> <br>
+ 
+
+  <h3 for="id_content">내용</h3> 
+  <textarea name="content" id="id_content" rows="4" required></textarea> <br>
+  
+  <h3 for="id_writer">작성자</h3>
+  <input type="text" name="writer" id="id_writer" required><br>
+
+  
+  <h3 for="id_image">이미지</h3>
+  <input type="file" name="image" id="id_image">
+
+  <h3 for="id_stacks">기술 스택</h3>
+  <select name="stacks" id="id_stacks">
+    <option value="python">Python</option>
+    <option value="django">Django</option>
+    <option value="javascript">JavaScript</option>
+    <option value="react">React</option>
+    <option value="java">Java</option>
+  </select>
+
+  <h3 for="id_github_link">GitHub 링크</h3>
+  <input type="url" name="github_link" id="id_github_link">
+  
+  <button type="submit" href="{% url 'user:board' %}">POST</button>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ board.title }} - 상세 페이지</title>
+</head>
+    <body>
+        <h1>{{ board.title }}</h1>
+        <p><strong>작성자:</strong> {{ board.writer }}</p>
+        <p>{{ board.content }}</p>
+        {% if board.image %}
+            <img src="{{ board.image.url }}" alt="첨부 이미지">
+        {% endif %}
+        <p><strong>기술 스택:</strong> {{ board.stacks }}</p>
+        <p><a href="{{ board.github_link }}" target="_blank">깃허브 링크</a></p>
+
+        <!-- 좋아요 버튼 -->
+        <form action="{% url 'user:toggle_like' board.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">*좋아요* ({{ board.like_set.count }})</button>
+        </form>
+
+ <!-- 댓글 작성 폼 (게시글 기준) -->
+ <h3>댓글 작성</h3>
+ <form action="{% url 'user:comment' board.id %}" method="post">
+     {% csrf_token %}
+     <textarea name="content" rows="4" cols="50"></textarea>
+     <button type="submit">댓글 작성</button>
+ </form>
+
+ <!-- 댓글 출력 -->
+ <h3>댓글</h3>
+ {% for comment in board.comment_set.all %}
+     {% if not comment.parent %}
+         <div style="margin-bottom: 20px;">
+             <strong>{{ comment.user.nickname }}</strong>: {{ comment.content }}
+             <small style="color: gray;">({{ comment.created_at|date:"Y-m-d H:i" }})</small>
+             <!-- 댓글 좋아요 -->
+             <form action="{% url 'user:toggle_comment_like' comment.id %}" method="post" style="display:inline;">
+                 {% csrf_token %}
+                 <button type="submit" style="margin-bottom: 10px;">댓글 좋아요 ({{ comment.likes.count }})</button>
+             </form>
+
+             <!-- 대댓글 작성 폼 -->
+             <form action="{% url 'user:comment' board.id %}" method="post">
+                 {% csrf_token %}
+                 <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                 <textarea name="content" rows="2" cols="50"></textarea>
+                 <button type="submit">대댓글 작성</button>
+             </form>
+
+             <!-- 대댓글 출력 -->
+             {% for reply in comment.replies.all %}
+                 <div style="margin-left: 30px;">
+                     <strong>{{ reply.user.nickname }}</strong>: {{ reply.content }}
+                     <small style="color: gray;">({{ reply.created_at|date:"Y-m-d H:i" }})</small>
+                     
+                     <!-- 대댓글 좋아요 -->
+                     <form action="{% url 'user:toggle_comment_like' reply.id %}" method="post" style="display:inline;">
+                         {% csrf_token %}
+                         <button type="submit" style="margin-bottom: 5px;">대댓글 좋아요 ({{ reply.likes.count }})</button>
+                     </form>
+                 </div>
+             {% endfor %}
+         </div>
+     {% endif %}
+ {% endfor %}
+    
+    </body>
+</html>
+
