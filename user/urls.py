@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import signup_view, login_view, logout_view, home_view
+from .views import signup_view, login_view, logout_view, home_view, board_view, comment_view, toggle_like_view,board_detail_view, toggle_comment_like_view
 from django.contrib.auth import views as auth_views  # 비밀번호 관련 뷰를 가져옴
+
 
 app_name='user'
 
@@ -17,4 +18,12 @@ urlpatterns = [
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
 
+  #게시판 기능 구현
+  path('board/board', board_view, name = 'board' ),
+
+  #좋아요 댓글글
+  path('board/<int:pk>/', board_detail_view, name='board_detail'),
+  path('board/<int:pk>/comment/', comment_view, name='comment'), 
+  path('board/<int:pk>/toggle_like/', toggle_like_view, name='toggle_like'), 
+  path('comment/<int:comment_id>/toggle_like/', toggle_comment_like_view, name='toggle_comment_like'),
 ]
