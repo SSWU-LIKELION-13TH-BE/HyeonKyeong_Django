@@ -6,6 +6,8 @@
 </head>
     <body>
         <h1>{{ board.title }}</h1>
+        <h5 class=hits>조회수 : {{ board.hits }}</h5>
+
         <p><strong>작성자:</strong> {{ board.writer }}</p>
         <p>{{ board.content }}</p>
         {% if board.image %}
