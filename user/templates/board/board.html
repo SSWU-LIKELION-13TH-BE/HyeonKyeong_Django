@@ -46,15 +46,14 @@
   <h3 for="id_image">이미지</h3>
   <input type="file" name="image" id="id_image">
 
-  <h3 for="id_stacks">기술 스택</h3>
-  <select name="stacks" id="id_stacks">
-    <option value="python">Python</option>
-    <option value="django">Django</option>
-    <option value="javascript">JavaScript</option>
-    <option value="react">React</option>
-    <option value="java">Java</option>
-  </select>
-
+  <h3>기술 스택</h3>
+  {% for stack in stacks %}
+    <label>
+      <input type="checkbox" name="stacks" value="{{ stack.id }}">
+      {{ stack.name }}
+    </label><br>
+  {% endfor %}
+  
   <h3 for="id_github_link">GitHub 링크</h3>
   <input type="url" name="github_link" id="id_github_link">
   
