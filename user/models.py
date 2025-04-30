@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.conf import settings
+from django.utils import timezone
 
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)

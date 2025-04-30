@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import SignUpForm
 from django.contrib.auth.forms import AuthenticationForm
@@ -17,6 +18,8 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             return redirect('user:login')
+        else:
+            print(form.errors) 
         else:
             print(form.errors) 
     else:
