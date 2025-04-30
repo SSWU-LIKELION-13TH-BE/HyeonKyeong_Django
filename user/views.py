@@ -11,6 +11,7 @@ from user.models import Stack
 
 from django.db.models import Q
 
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -70,6 +71,10 @@ def home_view(request):
         'board': board,
         'sort': sort,
         'search': search,
+
+    board = Board.objects.all().order_by('-id')  # 최신 글부터 보여줌
+    context = {
+        'board': board,
     }
     return render(request, 'home.html', context)
 
@@ -80,6 +85,9 @@ def board_view(request):
         content = request.POST.get('content')
         writer = request.user  # 현재 로그인된 유저 객체
         stack_ids = request.POST.getlist('stacks')   #  리스트로 받기!
+
+        writer = request.POST.get('writer')
+        stacks = request.POST.get('stacks')
         github_link = request.POST.get('github_link')
         image = request.FILES.get('image')
 
@@ -87,13 +95,19 @@ def board_view(request):
             title=title,
             content=content,
             writer=request.user,
+
+            writer=writer,
+            stacks=stacks,
+
             github_link=github_link,
             image=image,
         )
         board.save()
+
         stack_ids = request.POST.getlist('stacks')  # 체크된 값들: ['1', '3', ...]
         stack_objs = Stack.objects.filter(id__in=stack_ids)  # 실제 Stack 객체로 변환
         board.stacks.set(stack_objs)
+
         return redirect('user:home')
     else:
         boardForm = BoardForm()
@@ -103,6 +117,11 @@ def board_view(request):
             'boardForm': boardForm,
             'board': board,
             'stacks': stacks,
+
+        context = {
+            'boardForm': boardForm,
+            'board': board,
+
         }
         return render(request, 'board/board.html', context)
 
@@ -169,4 +188,3 @@ def toggle_comment_like_view(request, comment_id):
     if not created:
         like.delete()
     return redirect('user:board_detail', pk=comment.posting.id)
-

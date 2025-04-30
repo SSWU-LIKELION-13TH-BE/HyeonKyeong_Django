@@ -50,6 +50,7 @@
 
 <strong> <a href="{% url 'user:board' %}" >게시판 글쓰기</a> </strong>
 
+
 <form method="get" action="">
     <input type="text" name="q" placeholder="검색어 입력" value="{{ search }}">
     <button type="submit">정렬 및 검색</button>
@@ -59,8 +60,6 @@
         <option value="popular" {% if sort == 'popular' %}selected{% endif %}>인기순</option>
     </select>
 </form>
-
-
 
 {% if board %}
   <table>
@@ -75,6 +74,7 @@
         <th>깃허브 링크</th>
         <th>조회수</th>
         <th>작성일</th>
+
       </tr>
     </thead>
     <tbody>
@@ -107,6 +107,9 @@
           <td><a href="{{ board_list.github_link }}" target="_blank">{{ board_list.github_link }}</a></td>
           <td>{{ board_list.hits }}</td> <!-- 조회수 출력 -->
           <td>{{ board_list.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ board_list.stacks }}</td>
+          <td><a href="{{ board_list.github_link }}" target="_blank">{{ board_list.github_link }}</a></td>
+
         </tr>
       {% endfor %}
     </tbody>

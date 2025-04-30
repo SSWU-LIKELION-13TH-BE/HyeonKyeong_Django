@@ -21,6 +21,7 @@ class Board(models.Model):
     title = models.CharField(max_length=20, null=True)
     content = models.TextField()
     writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='boards', null=True, blank=True)
+    writer = models.CharField(max_length=20, null=True)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     STACK_CHOICES = [
         ('python', 'Python'),
@@ -33,6 +34,8 @@ class Board(models.Model):
     github_link = models.URLField(null=True, blank=True)
     hits = models.PositiveIntegerField(default=0, verbose_name='조회수')
     created_at = models.DateTimeField(auto_now_add=True)
+    stacks = models.CharField(max_length=200, choices=STACK_CHOICES, null=True, blank=True)
+    github_link = models.URLField(null=True, blank=True)
 
 
 
@@ -63,3 +66,4 @@ class CommentLike(models.Model):
     class Meta:
         db_table = 'comment_likes'
         unique_together = ('user', 'comment')  # 중복 좋아요 방지
+
