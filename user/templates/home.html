@@ -28,30 +28,6 @@
         }
         
       </style>
-    <style>
-  
-        form {
-          text-align: center;
-        }
-        th, td{
-          border: solid 1px black;
-        }
-        input, textarea {
-          width: 100%;
-          padding-bottom: 10%;
-        }
-        button{
-          width: 100%;
-          padding: 10px;
-          margin-top: 5%;
-          background-color: gainsboro;
-        }
-      
-        img{
-          width: 100px;
-        }
-        
-      </style>
 </head>
 <body>
     <h2>홈 페이지</h2>
@@ -73,20 +49,9 @@
 <br>
 
 <strong> <a href="{% url 'user:board' %}" >게시판 글쓰기</a> </strong>
-
-<form method="get" action="">
-    <input type="text" name="q" placeholder="검색어 입력" value="{{ search }}">
-    <button type="submit">정렬 및 검색</button>
-
-    <select name="sort" onchange="this.form.submit()">
-        <option value="latest" {% if sort == 'latest' %}selected{% endif %}>최신순</option>
-        <option value="popular" {% if sort == 'popular' %}selected{% endif %}>인기순</option>
-    </select>
-</form>
+<strong> <a href="{% url 'user:mypage' %}" >마이 페이지</a> </strong>
 
 
-
-{% if board %}
   <table>
     <thead>
       <tr>
@@ -97,45 +62,55 @@
         <th>이미지</th>
         <th>기술 스택</th>
         <th>깃허브 링크</th>
-        <th>조회수</th>
-        <th>작성일</th>
       </tr>
     </thead>
     <tbody>
-      {% for board_list in board %}
         <tr>
           <td>{{ board_list.pk }}</td>
           <td>
             {% if board_list.pk %}
-              <a href="{% url 'user:board_detail' board_list.pk %}">
-                {{ board_list.title }}
+              <a href="{% url 'user:board_detail' board.pk %}">
+                {{ board.title }}
               </a>
             {% else %}
-              {{ board_list.title }}
+              {{ board.title }}
             {% endif %}
           </td>
-          <td>{{ board_list.content }}</td>
-          <td>{{ board_list.writer }}</td>
+          <td>{{ board.content }}</td>
+          <td>{{ board.writer }}</td>
           <td>
-            {% if board_list.image %}
-              <img src="{{ board_list.image.url }}" alt="첨부 이미지">
+            {% if board.image %}
+              <img src="{{ board.image.url }}" alt="첨부 이미지">
             {% endif %}
           </td>
-          <td>
-            {% for stack in board_list.stacks.all %}
-              {{ stack.name }}{% if not forloop.last %}, {% endif %}
-            {% empty %}
-              없음
-            {% endfor %}
-          </td>
-          <td><a href="{{ board_list.github_link }}" target="_blank">{{ board_list.github_link }}</a></td>
-          <td>{{ board_list.hits }}</td> <!-- 조회수 출력 -->
-          <td>{{ board_list.created_at|date:"Y-m-d H:i" }}</td>
-        </tr>
-      {% endfor %}
+          
+          {% for board in board_list %}
+          <tr>
+            <td>{{ board.pk }}</td>
+            <td>
+              <a href="{% url 'user:board_detail' board.pk %}">{{ board.title }}</a>
+            </td>
+            <td>{{ board.content }}</td>
+            <td>{{ board.writer }}</td>
+            <td>
+              {% if board.image %}
+                <img src="{{ board.image.url }}" alt="첨부 이미지">
+              {% endif %}
+            </td>
+            <td>
+              {% for stack in board.stacks.all %}
+                {{ stack.name }}{% if not forloop.last %}, {% endif %}
+              {% empty %}
+                없음
+              {% endfor %}
+            </td>
+            <td>
+              <a href="{{ board.github_link }}" target="_blank">{{ board.github_link }}</a>
+            </td>
+          </tr>
+        {% endfor %}
     </tbody>
   </table>
-{% endif %}
 
 
 </body>
