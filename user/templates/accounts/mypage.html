@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My page</title>
+</head>
+<body>
+
+    <h2>{{ user.nickname }}님의 마이페이지</h2>
+    
+    <a href="{% url 'user:profile_edit' %}">회원정보 수정</a>
+    
+    <a href="{% url 'user:guestbook' user.username %}">내 방명록 보기</a>
+    <ul>
+      {% for post in posts %}
+        <li>
+          <a href="{% url 'user:board_detail' post.pk %}">{{ post.title }}</a>
+          <a href="{% url 'user:post_edit' post.pk %}">수정</a>
+          <a href="{% url 'user:post_delete' post.pk %}">삭제</a>
+
+        </li>
+      {% empty %}
+        <li>작성한 게시물이 없습니다.</li>
+      {% endfor %}
+    </ul>
+
+</ul>
+</body>
+</html>

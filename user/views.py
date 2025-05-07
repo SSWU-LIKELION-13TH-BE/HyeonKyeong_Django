@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from .forms import SignUpForm
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from .forms import SignUpForm, ProfileUpdateForm
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Like, Board, Comment, CommentLike
-from .forms import BoardForm, CommentForm
+from .models import Like, Board, Comment, CommentLike, Stack, Guestbook
+from .forms import BoardForm, CommentForm, GuestbookForm
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
-from user.models import Stack
+
+from django.http import HttpResponseForbidden
 
 from django.db.models import Q
 
@@ -49,34 +50,30 @@ def logout_view(request):
 
 
 def home_view(request):
-    sort = request.GET.get('sort', 'latest')  # 기본값: 최신순
-    search = request.GET.get('q', '')         # 검색어
+    sort = request.GET.get('sort', 'latest')
+    search = request.GET.get('q', '')
 
-    board = Board.objects.all()
+    board_list = Board.objects.all()
 
-    # 검색 처리: 제목이나 내용에 검색어 포함된 게시글 필터링
     if search:
-        board = board.filter(
+        board_list = board_list.filter(
+
             Q(title__icontains=search) |
             Q(content__icontains=search)
         )
 
-    # 정렬 처리
     if sort == 'latest':
-        board = board.order_by('-created_at')  # 생성일 역순
+        board_list = board_list.order_by('-created_at')
     elif sort == 'popular':
-        board = board.order_by('-hits')        # 조회수 역순
+        board_list = board_list.order_by('-hits')
 
     context = {
-        'board': board,
+        'board_list': board_list,
         'sort': sort,
         'search': search,
-
-    board = Board.objects.all().order_by('-id')  # 최신 글부터 보여줌
-    context = {
-        'board': board,
     }
     return render(request, 'home.html', context)
+
 
 
 def board_view(request):
@@ -85,9 +82,6 @@ def board_view(request):
         content = request.POST.get('content')
         writer = request.user  # 현재 로그인된 유저 객체
         stack_ids = request.POST.getlist('stacks')   #  리스트로 받기!
-
-        writer = request.POST.get('writer')
-        stacks = request.POST.get('stacks')
         github_link = request.POST.get('github_link')
         image = request.FILES.get('image')
 
@@ -95,19 +89,12 @@ def board_view(request):
             title=title,
             content=content,
             writer=request.user,
-
-            writer=writer,
-            stacks=stacks,
-
             github_link=github_link,
             image=image,
         )
         board.save()
-
-        stack_ids = request.POST.getlist('stacks')  # 체크된 값들: ['1', '3', ...]
-        stack_objs = Stack.objects.filter(id__in=stack_ids)  # 실제 Stack 객체로 변환
+        stack_objs = Stack.objects.filter(id__in=stack_ids)
         board.stacks.set(stack_objs)
-
         return redirect('user:home')
     else:
         boardForm = BoardForm()
@@ -117,11 +104,6 @@ def board_view(request):
             'boardForm': boardForm,
             'board': board,
             'stacks': stacks,
-
-        context = {
-            'boardForm': boardForm,
-            'board': board,
-
         }
         return render(request, 'board/board.html', context)
 
@@ -154,13 +136,22 @@ def board_detail_view(request, pk):
     board = get_object_or_404(Board, pk=pk)
     comment_form = CommentForm()
 
+    # guestbooks 조회
+    guestbooks = Guestbook.objects.filter(owner=board.writer)
+
     cookie_name = 'hit_board'
     cookie_value = request.COOKIES.get(cookie_name, '_')
 
-    # 조회수 증가 조건
+    context = {
+        'board': board,
+        'comment_form': comment_form,
+        'guestbooks': guestbooks,
+        'writer': board.writer,  # 템플릿에서 writer.username 쓸 수 있도록
+    }
+
+    # 조회수 쿠키 조건
     if f'_{pk}_' not in cookie_value:
         cookie_value += f'{pk}_'
-
         expire_date = datetime.now() + timedelta(days=1)
         expire_date = expire_date.replace(hour=0, minute=0, second=0, microsecond=0)
         max_age = (expire_date - datetime.now()).total_seconds()
@@ -168,18 +159,11 @@ def board_detail_view(request, pk):
         board.hits += 1
         board.save()
 
-        response = render(request, 'board/board_detail.html', {
-            'board': board,
-            'comment_form': comment_form,
-        })
+        response = render(request, 'board/board_detail.html', context)
         response.set_cookie(cookie_name, value=cookie_value, max_age=max_age, httponly=True)
         return response
 
-    # 이미 본 글인 경우
-    return render(request, 'board/board_detail.html', {
-        'board': board,
-        'comment_form': comment_form,
-    })
+    return render(request, 'board/board_detail.html', context)
 
 
 def toggle_comment_like_view(request, comment_id):
@@ -188,3 +172,70 @@ def toggle_comment_like_view(request, comment_id):
     if not created:
         like.delete()
     return redirect('user:board_detail', pk=comment.posting.id)
+  
+@login_required
+def profile_edit_view(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('user:mypage')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+    return render(request, 'accounts/profile_edit.html', {'form': form})
+
+
+@login_required
+def post_edit(request, pk):
+    post = get_object_or_404(Board, pk=pk, writer=request.user)
+    if request.method == 'POST':
+        form = BoardForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('user:mypage')
+    else:
+        form = BoardForm(instance=post)
+    return render(request, 'accounts/post_edit.html', {'form': form})
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Board, pk=pk, writer=request.user)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('user:mypage')
+    return render(request, 'accounts/post_confirm_delete.html', {'post': post})
+
+@login_required
+def mypage_view(request):
+    posts = Board.objects.filter(writer=request.user)
+    return render(request, 'accounts/mypage.html', {'user': request.user, 'posts': posts})
+
+
+@login_required
+def guestbook_view(request, username):
+    CustomUser = get_user_model()
+    owner = get_object_or_404(CustomUser, username=username)
+
+    if request.method == 'POST':
+        form = GuestbookForm(request.POST)
+        if form.is_valid():
+            guestbook = form.save(commit=False)
+            guestbook.owner = owner
+            guestbook.writer = request.user
+            guestbook.save()
+            return redirect('user:guestbook', username=username)
+    else:
+        form = GuestbookForm()
+
+    # 본인만 볼 수 있도록
+    if request.user == owner:
+        guestbooks = Guestbook.objects.filter(owner=owner)
+    else:
+        guestbooks = None
+
+    return render(request, 'accounts/guestbook.html', {
+        'form': form,
+        'guestbooks': guestbooks,
+        'owner': owner,
+    })
+

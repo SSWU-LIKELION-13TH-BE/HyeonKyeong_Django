@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import CustomUser
 from django.forms import ModelForm
 from .models import *
@@ -23,3 +23,18 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
+
+class ProfileUpdateForm(UserChangeForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'nickname', 'email']
+
+
+
+class GuestbookForm(forms.ModelForm):
+    class Meta:
+        model = Guestbook
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': '방명록을 남겨보세요!'}),
+        }

@@ -9,11 +9,30 @@
         <h5 class=hits>조회수 : {{ board.hits }}</h5>
 
         <p><strong>작성자:</strong> {{ board.writer }}</p>
+        
+        {% if board.writer.username %}
+        <a href="{% url 'user:guestbook' username=board.writer.username %}">
+            {{ board.writer.nickname }}님에게 방명록 남기기
+        </a>
+        {% else %}
+        <span>방명록 링크 없음</span>
+        {% endif %}
+        
         <p>{{ board.content }}</p>
         {% if board.image %}
             <img src="{{ board.image.url }}" alt="첨부 이미지">
         {% endif %}
-        <p><strong>기술 스택:</strong> {{ board.stacks }}</p>
+
+        <!-- 스택 버튼 -->
+        <p>전체 스택:</p>
+        <ul>
+        {% for stack in stacks %}
+            <li>{{ stack.name }}</li>
+        {% empty %}
+            <li>스택이 없습니다.</li>
+        {% endfor %}
+        </ul>
+
         <p><a href="{{ board.github_link }}" target="_blank">깃허브 링크</a></p>
 
         <!-- 좋아요 버튼 -->
@@ -22,13 +41,13 @@
             <button type="submit">*좋아요* ({{ board.like_set.count }})</button>
         </form>
 
- <!-- 댓글 작성 폼 (게시글 기준) -->
- <h3>댓글 작성</h3>
- <form action="{% url 'user:comment' board.id %}" method="post">
-     {% csrf_token %}
-     <textarea name="content" rows="4" cols="50"></textarea>
-     <button type="submit">댓글 작성</button>
- </form>
+    <!-- 댓글 작성 폼 (게시글 기준) -->
+    <h3>댓글 작성</h3>
+    <form action="{% url 'user:comment' board.id %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" cols="50"></textarea>
+        <button type="submit">댓글 작성</button>
+    </form>
 
  <!-- 댓글 출력 -->
  <h3>댓글</h3>
@@ -70,4 +89,3 @@
     
     </body>
 </html>
-

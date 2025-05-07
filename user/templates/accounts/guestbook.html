@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>guestbooks</title>
+</head>
+<body>
+    <h2>{{ owner.nickname }}님의 방명록</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">남기기</button>
+</form>
+
+<hr>
+
+<ul>
+  {% for entry in guestbooks %}
+    <li>
+      <strong>{{ entry.writer.nickname }}</strong>: {{ entry.content }}
+      <br><small>{{ entry.created_at }}</small>
+    </li>
+  {% empty %}
+    <li>아직 방명록이 없습니다.</li>
+  {% endfor %}
+
+  {% if user == owner %}
+  <h3>받은 방명록</h3>
+  <ul>
+    {% for entry in guestbooks %}
+      <li>
+        <strong>{{ entry.writer.nickname }}</strong>: {{ entry.content }}
+        <small style="color:gray;">{{ entry.created_at }}</small>
+      </li>
+    {% empty %}
+      <li>아직 방명록이 없습니다.</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>이 방명록은 {{ owner.nickname }}님만 볼 수 있어요.</p>
+{% endif %}
+</ul>
+</body>
+</html>
