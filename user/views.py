@@ -146,8 +146,9 @@ def board_detail_view(request, pk):
         'board': board,
         'comment_form': comment_form,
         'guestbooks': guestbooks,
-        'writer': board.writer,  # 템플릿에서 writer.username 쓸 수 있도록
+        'writer': board.writer,
     }
+    response = render(request, 'board/board_detail.html', context)
 
     # 조회수 쿠키 조건
     if f'_{pk}_' not in cookie_value:
@@ -159,11 +160,9 @@ def board_detail_view(request, pk):
         board.hits += 1
         board.save()
 
-        response = render(request, 'board/board_detail.html', context)
         response.set_cookie(cookie_name, value=cookie_value, max_age=max_age, httponly=True)
-        return response
 
-    return render(request, 'board/board_detail.html', context)
+    return response
 
 
 def toggle_comment_like_view(request, comment_id):
