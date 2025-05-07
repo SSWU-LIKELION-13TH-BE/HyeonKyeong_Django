@@ -50,8 +50,6 @@
 
 <strong> <a href="{% url 'user:board' %}" >게시판 글쓰기</a> </strong>
 <strong> <a href="{% url 'user:mypage' %}" >마이 페이지</a> </strong>
-
-
   <table>
     <thead>
       <tr>
@@ -62,6 +60,9 @@
         <th>이미지</th>
         <th>기술 스택</th>
         <th>깃허브 링크</th>
+        <th>조회수</th>
+        <th>작성일</th>
+
       </tr>
     </thead>
     <tbody>
@@ -83,7 +84,6 @@
               <img src="{{ board.image.url }}" alt="첨부 이미지">
             {% endif %}
           </td>
-          
           {% for board in board_list %}
           <tr>
             <td>{{ board.pk }}</td>
@@ -109,8 +109,10 @@
             </td>
           </tr>
         {% endfor %}
+
     </tbody>
   </table>
+
 
 
 </body>

@@ -17,11 +17,17 @@ class CustomUser(AbstractUser):
     groups = models.ManyToManyField(Group, related_name="customuser_set", blank=True)
     user_permissions = models.ManyToManyField(Permission, related_name="customuser_permissions_set", blank=True)
 
+class Stack(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
 
 class Board(models.Model):
     title = models.CharField(max_length=20, null=True)
     content = models.TextField()
     writer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     STACK_CHOICES = [
         ('python', 'Python'),
@@ -43,6 +49,7 @@ class Comment(models.Model):
     posting    = models.ForeignKey('Board', on_delete=models.CASCADE)
     content    = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     parent     = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
 

@@ -7,6 +7,7 @@ from .models import Like, Board, Comment, CommentLike, Stack, Guestbook
 from .forms import BoardForm, CommentForm, GuestbookForm
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
+
 from django.http import HttpResponseForbidden
 
 from django.db.models import Q
@@ -56,6 +57,7 @@ def home_view(request):
 
     if search:
         board_list = board_list.filter(
+
             Q(title__icontains=search) |
             Q(content__icontains=search)
         )
@@ -163,14 +165,14 @@ def board_detail_view(request, pk):
 
     return render(request, 'board/board_detail.html', context)
 
+
 def toggle_comment_like_view(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
     like, created = CommentLike.objects.get_or_create(user=request.user, comment=comment)
     if not created:
         like.delete()
     return redirect('user:board_detail', pk=comment.posting.id)
-
-
+  
 @login_required
 def profile_edit_view(request):
     if request.method == 'POST':
@@ -236,3 +238,4 @@ def guestbook_view(request, username):
         'guestbooks': guestbooks,
         'owner': owner,
     })
+
