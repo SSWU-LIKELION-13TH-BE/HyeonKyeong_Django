@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from .forms import SignUpForm, ProfileUpdateForm
 from django.contrib.auth.forms import AuthenticationForm
@@ -133,16 +132,24 @@ def toggle_like_view(request, pk):
     
 def board_detail_view(request, pk):
     board = get_object_or_404(Board, pk=pk)
-    print(board.stacks.all())
     comment_form = CommentForm()
+
+    # guestbooks 조회
+    guestbooks = Guestbook.objects.filter(owner=board.writer)
 
     cookie_name = 'hit_board'
     cookie_value = request.COOKIES.get(cookie_name, '_')
 
-    # 조회수 증가 조건
+    context = {
+        'board': board,
+        'comment_form': comment_form,
+        'guestbooks': guestbooks,
+        'writer': board.writer,  # 템플릿에서 writer.username 쓸 수 있도록
+    }
+
+    # 조회수 쿠키 조건
     if f'_{pk}_' not in cookie_value:
         cookie_value += f'{pk}_'
-
         expire_date = datetime.now() + timedelta(days=1)
         expire_date = expire_date.replace(hour=0, minute=0, second=0, microsecond=0)
         max_age = (expire_date - datetime.now()).total_seconds()
@@ -150,19 +157,11 @@ def board_detail_view(request, pk):
         board.hits += 1
         board.save()
 
-        response = render(request, 'board/board_detail.html', {
-            'board': board,
-            'comment_form': comment_form,
-        })
+        response = render(request, 'board/board_detail.html', context)
         response.set_cookie(cookie_name, value=cookie_value, max_age=max_age, httponly=True)
         return response
 
-    # 이미 본 글인 경우
-    return render(request, 'board/board_detail.html', {
-        'board': board,
-        'comment_form': comment_form,
-    })
-
+    return render(request, 'board/board_detail.html', context)
 
 def toggle_comment_like_view(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)

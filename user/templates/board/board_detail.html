@@ -8,12 +8,15 @@
         <h1>{{ board.title }}</h1>
         <h5 class=hits>조회수 : {{ board.hits }}</h5>
         <p><strong>작성자:</strong> {{ board.writer }}</p>
-        {% if board_list.writer.username %}
-            <a href="{% url 'user:guestbook' username=board_list.writer.username %}">방명록</a>
+        
+        {% if board.writer.username %}
+        <a href="{% url 'user:guestbook' username=board.writer.username %}">
+            {{ board.writer.nickname }}님에게 방명록 남기기
+        </a>
         {% else %}
-            <span>방명록 링크 없음</span>
+        <span>방명록 링크 없음</span>
         {% endif %}
-
+        
         <p>{{ board.content }}</p>
         {% if board.image %}
             <img src="{{ board.image.url }}" alt="첨부 이미지">
