@@ -148,7 +148,6 @@ def board_detail_view(request, pk):
         'guestbooks': guestbooks,
         'writer': board.writer,
     }
-
     response = render(request, 'board/board_detail.html', context)
 
     # 조회수 쿠키 조건
