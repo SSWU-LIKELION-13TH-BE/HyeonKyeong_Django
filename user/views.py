@@ -7,11 +7,18 @@ from .models import Like, Board, Comment, CommentLike, Stack, Guestbook
 from .forms import BoardForm, CommentForm, GuestbookForm
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 
 from django.http import HttpResponseForbidden
 
 from django.db.models import Q
+from allauth.socialaccount.models import SocialAccount
 
+from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
+from allauth.socialaccount.helpers import complete_social_login
+from allauth.socialaccount.models import SocialLogin
+
+from myproject import conf
 
 def signup_view(request):
     if request.method == 'POST':
@@ -238,3 +245,64 @@ def guestbook_view(request, username):
         'owner': owner,
     })
 
+
+def kakao_callback(request):
+    code = request.GET.get('code')  # 카카오로부터 전달받은 code
+    if code:
+        # 카카오 서버에 access token 요청
+        token_url = 'https://kauth.kakao.com/oauth/token'
+        data = {
+            'grant_type': 'authorization_code',
+            'client_id': 'c41b0d12f3cdcd284fe2a1c3ce18e6a4',  # 카카오 JavaScript 키
+            'redirect_uri': 'http://127.0.0.1:8000/user/kakao/callback/',
+            'code': code,
+        }
+        response = requests.post(token_url, data=data)
+        token_data = response.json()
+        access_token = token_data.get('access_token')
+
+        # 액세스 토큰을 사용하여 사용자 정보 가져오기
+        user_info_url = 'https://kapi.kakao.com/v2/user/me'
+        headers = {'Authorization': f'Bearer {access_token}'}
+        user_info_response = requests.get(user_info_url, headers=headers)
+        user_info = user_info_response.json()
+
+        # 사용자 정보 확인 및 로그인 처리
+        kakao_id = user_info.get('id')
+        user_email = user_info.get('kakao_account', {}).get('email')
+        
+        # 사용자 확인 (이미 등록된 유저인지 확인)
+        user = User.objects.filter(username=kakao_id).first()
+        if user is None:
+            # 신규 사용자 생성
+            user = User.objects.create(
+                username=kakao_id,
+                email=user_email,
+                password=None,  # 패스워드는 필요 없음
+            )
+        
+        # 로그인 처리
+        login(request, user)
+        return redirect('user:home')  # 로그인 후 홈으로 리디렉션
+
+    return JsonResponse({'error': '로그인 실패'})
+
+def naver_callback(request):
+    client_id = settings.NAVER_CLIENT_ID
+    client_secret = settings.NAVER_CLIENT_SECRET
+    redirect_uri = "http://127.0.0.1:8000/accounts/naver/login/callback/"
+    code = request.GET.get("code")
+    state = request.GET.get("state")
+    # Access Token 요청
+    token_request = requests.post(
+        "https://nid.naver.com/oauth2.0/token",
+        data={
+            "grant_type": "authorization_code",
+            "client_id": conf.NAVER_CLIENT_ID,
+            "client_secret": conf.NAVER_CLIENT_SECRET,
+            "redirect_uri": redirect_uri,
+            "code": code,
+            "state": state,
+        },
+    )
+    # 이후 사용자 정보 요청 및 로그인 처리

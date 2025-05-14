@@ -6,17 +6,28 @@
     <title>로그인</title>
 </head>
 <body>
-    <h2> 로그인 </h2>
-    
-        <p>로그인 하세요</p>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" href="{% url 'user:logout' %}"> 로그인</button>
-        </form>
-    
-        <p>계정이 없으신가요? <a href="{% url 'user:signup' %}">회원가입</a></p> 
-    
-    
+    <h2>로그인</h2>
+
+    <p>로그인 하세요</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">로그인</button>
+    </form>
+
+    <p>소셜 로그인인</p>
+
+    <!-- 카카오 로그인 버튼 -->
+    {% load socialaccount %}
+    <button type="button" onclick="location.href = '{% provider_login_url 'kakao' %}'" class="kakao-login-btn">
+        <div class="kakao-login-text">카카오로 로그인</div>
+    </button>
+
+    <!-- 네이버 로그인 버튼 -->
+    <button type="button" onclick="location.href = '{% provider_login_url 'naver' %}'" class="naver-login-text">
+    <div class="naver-login-text">네이버 로그인</div>
+</button>
+
+    <p>계정이 없으신가요? <a href="{% url 'user:signup' %}">회원가입</a></p>
 </body>
 </html>
